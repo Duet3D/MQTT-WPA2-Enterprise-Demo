@@ -28,8 +28,8 @@ Broker configuration can be found in [mosquitto.conf](./mosquitto.conf). This co
 The clear text contents of the password file [passwords.txt](./passwords.txt) are as follows:
 
 ```
-test-echo:test-echo-pswd
-test-duet:test-duet-pswd
+mqtt-echo:mqtt-echo-pswd
+mqtt-duet:mqtt-duet-pswd
 ```
 
 Running the command `mosquitto_passwd -U passwords.txt` on the clear text contents will replace the password part (the text after the colon on each row) with its hash.
@@ -50,41 +50,14 @@ python echo.py
 Running the [GCode commands on RepRapFirmware](#reprapfirmware), a log similar to the following one should be seen.
 
 ```
-1671016326: mosquitto version 2.0.15 starting
-1671016326: Config loaded from mosquitto.conf.
-1671016326: Opening ipv4 listen socket on port 1884.
-1671016326: Opening ipv6 listen socket on port 1884.
-1671016326: mosquitto version 2.0.15 running
-echo: connecting to 'localhost' on port '1884' as 'echo'...
-1671016327: New connection from ::1:39785 on port 1884.
-1671016327: New client connected from ::1:39785 as echo (p2, c1, k60, u'test-echo').
-1671016327: No will message specified.
-1671016327: Sending CONNACK to echo (0, 0)
+echo: connecting to 'test-router' on port '1883' as 'echo'...
 echo: connect succeeded, subscribing to topic 'topic-duet'...
-1671016327: Received SUBSCRIBE from echo
-1671016327:     topic-duet (QoS 0)
-1671016327: echo 0 topic-duet
-1671016327: Sending SUBACK to echo
-echo: subscribe succeeded, waiting for messages...
-1671016359: New connection from 192.168.10.125:60423 on port 1884.
-1671016359: New client connected from 192.168.10.125:60423 as duet (p2, c1, k400, u'test-duet').
-1671016359: No will message specified.
-1671016359: Sending CONNACK to duet (0, 0)
-1671016359: Received SUBSCRIBE from duet
-1671016359:     topic-echo (QoS 0)
-1671016359: duet 0 topic-echo
-1671016359: Sending SUBACK to duet
-1671016365: Received PUBLISH from duet (d0, q0, r0, m0, 'topic-duet', ... (12 bytes))
-1671016365: Sending PUBLISH to echo (d0, q0, r0, m0, 'topic-duet', ... (12 bytes))
-echo: received message with topic 'topic-duet': 'b'duet-message\n'', echoing...
+echo: subscribe to 'topic-duet' succeeded, waiting for messages...
+echo: subscribing to will topic 'topic-will'...
+echo: subscribe to 'topic-will' succeeded, waiting for messages...
+echo: received message with topic 'topic-duet': 'b'duet-message'', echoing...
 echo: echo succeeded
-1671016365: Received PUBLISH from echo (d0, q0, r0, m0, 'topic-echo', ... (12 bytes))
-1671016365: Sending PUBLISH to duet (d0, q0, r0, m0, 'topic-echo', ... (12 bytes))
-1671016372: Received DISCONNECT from duet
-1671016372: Client duet disconnected.
-
 ```
-
 
 ## RepRapFirmware
 
@@ -100,19 +73,21 @@ M111 P2 S1
 
 ```
 M586.4 C"duet"
-M586.4 U"test-duet" K"test-duet-pswd"
+M586.4 U"mqtt-duet" K"mqtt-duet-pswd"
 M586.4 P"topic-duet" D0 R0 Q0
 M586.4 S"topic-echo" Q0
+M586.4 W"duet has disconnected" T"topic-will"
 ```
 
 - `C` - Client ID
 - `U`, `K` - Username and password ()
 - `S`, `Q` - Subcription topic and corresponding QOS
 - `P`, `D`, `R`, `Q` - Publish settings: topic, duplicate flag, retain flag, QOS
+- `W`, `T` - Will message and topic
 ### Enable the MQTT protocol
 
 ```
-M586 P4 R1884 H192.168.10.244 S1
+M586 P4 H192.168.111.1 S1
 ```
 
 ### Publish a message via M118
@@ -130,9 +105,24 @@ Received message from topic 'topic-echo': 'duet-message'
 
 ### Disable the MQTT Protocol
 
+This gracefully ends the MQTT session established by `M586 P4 H192.168.111.1 S1`.
+
 ```
 M586 P4 S0
 ```
+
+#### Will message
+
+If the MQTT session is not gracefully closed by using `M586 P4 S0`, the will message is sent by
+the broker to subscribers of the will topic.
+
+One way to do this is to disable the network interface without issuing a `M586 P4 S0` first. For example, if using WiFi, that would be `M552 S0`.
+This message will be printed by `echo.py`:
+
+```
+echo: recieved will message with topic 'topic-will': b'duet has disconnected'
+```
+
 # Scenarios
 
 
@@ -152,3 +142,5 @@ M586 P4 S0
 
     - This is not ok, and should results in an error GCode result. Configuration is
         only possible while the protocol is disabled.
+
+5. Network interface is disabled while MQTT client is active
