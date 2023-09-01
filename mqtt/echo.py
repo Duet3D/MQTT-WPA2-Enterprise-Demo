@@ -7,7 +7,7 @@ import subprocess
 from colorama import Fore
 from colorama import Style
 
-HOST = "test-router"
+HOST = "demo-router"
 PORT = 1883
 USERNAME = "mqtt-echo"
 PASSWORD = "mqtt-echo-pswd"
@@ -54,8 +54,7 @@ def on_message(client, userdata, msg):
     else:
         print(f"{Fore.YELLOW}echo: recieved will message with topic '{msg.topic}': {msg.payload} {Style.RESET_ALL}")
 
-
-def echo():
+def main():
     client = mqtt.Client(CLIENT_ID)
     client.username_pw_set(USERNAME, PASSWORD)
 
@@ -65,9 +64,6 @@ def echo():
     print(f"{Fore.YELLOW}echo: connecting to '{HOST}' on port '{PORT}' as '{CLIENT_ID}'{Style.RESET_ALL}...")
     client.connect(HOST, PORT)
     client.loop_forever()
-
-def main():
-    echo()
 
 if __name__ == '__main__':
     main()

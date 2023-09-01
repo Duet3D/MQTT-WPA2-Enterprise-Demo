@@ -16,14 +16,14 @@ The demo has three components: the MQTT broker, the `echo` MQTT client and the R
 The RRF MQTT client publishes message sent via `M118` under a topic `topic-duet`.
 The `echo` MQTT client is subscribed to this topic, which retransmits the message under the topic `topic-echo`. Since the RRF MQTT client in turn is subscribed to this topic, it receives and displays the retransmitted message.
 
-## Broker Configuration
+### Broker
 
 Broker configuration can be found in [mosquitto.conf](./mosquitto.conf). This configuration:
 - disallows anonymous clients, allowing only clients with authentication credentials to connect
 - specifies the password file, [passwords.txt](./passwords.txt), whose contents are the allowed client usernames and the corresponding password hashes
 - runs the MQTT broker on a different port, 1884 instead of the typical 1883
 
-## Password File
+#### Password File
 
 The clear text contents of the password file [passwords.txt](./passwords.txt) are as follows:
 
@@ -50,7 +50,7 @@ python echo.py
 Running the [GCode commands on RepRapFirmware](#reprapfirmware), a log similar to the following one should be seen.
 
 ```
-echo: connecting to 'test-router' on port '1883' as 'echo'...
+echo: connecting to 'demo-router' on port '1883' as 'echo'...
 echo: connect succeeded, subscribing to topic 'topic-duet'...
 echo: subscribe to 'topic-duet' succeeded, waiting for messages...
 echo: subscribing to will topic 'topic-will'...
@@ -59,9 +59,8 @@ echo: received message with topic 'topic-duet': 'b'duet-message'', echoing...
 echo: echo succeeded
 ```
 
-## RepRapFirmware
+## Board
 
-The WiFi interface must be configured and enabled.
 
 ### Enable debugging messages (optional)
 
@@ -72,21 +71,24 @@ M111 P2 S1
 ### Configure the MQTT client
 
 ```
+; Set client id as "duet"
 M586.4 C"duet"
+; Set credentials for authenticating with MQTT broker
 M586.4 U"mqtt-duet" K"mqtt-duet-pswd"
-M586.4 P"topic-duet" D0 R0 Q0
+; Messages will be published under topic: "topic-duet";
+; QOS=0, do not retain and not duplicate
+M586.4 P"topic-duet" Q0 D0 R0
+; Subscribe to topic: "topic-echo"
 M586.4 S"topic-echo" Q0
+; Set last will and testament message and topic
 M586.4 W"duet has disconnected" T"topic-will"
 ```
 
-- `C` - Client ID
-- `U`, `K` - Username and password ()
-- `S`, `Q` - Subcription topic and corresponding QOS
-- `P`, `D`, `R`, `Q` - Publish settings: topic, duplicate flag, retain flag, QOS
-- `W`, `T` - Will message and topic
 ### Enable the MQTT protocol
 
 ```
+; Sets 192.168.111.1 as MQTT broker IP, default port 1883 is used
+; since it's not specified
 M586 P4 H192.168.111.1 S1
 ```
 
@@ -111,7 +113,7 @@ This gracefully ends the MQTT session established by `M586 P4 H192.168.111.1 S1`
 M586 P4 S0
 ```
 
-#### Will message
+#### Last Will and Testament
 
 If the MQTT session is not gracefully closed by using `M586 P4 S0`, the will message is sent by
 the broker to subscribers of the will topic.
@@ -143,4 +145,4 @@ echo: recieved will message with topic 'topic-will': b'duet has disconnected'
     - This is not ok, and should results in an error GCode result. Configuration is
         only possible while the protocol is disabled.
 
-5. Network interface is disabled while MQTT client is active
+5. Network interface is disabled while MQTT client is active```
