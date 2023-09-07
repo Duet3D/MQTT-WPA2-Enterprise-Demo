@@ -11,10 +11,13 @@ HOST = "demo-router"
 PORT = 1883
 USERNAME = "mqtt-echo"
 PASSWORD = "mqtt-echo-pswd"
+
 CLIENT_ID = "echo"
+
 SUBSCRIBE_TOPIC = "topic-duet"
 PUBLISH_TOPIC = "topic-echo"
 WILL_TOPIC = "topic-will"
+EXTRA_TOPIC = "topic-extra"
 
 topics = dict()
 
@@ -27,13 +30,17 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         def display(result, topic):
             if result == 0:
-                print(f"{Fore.YELLOW}echo: subscribe to '{topic}' succeeded, waiting for messages...{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}echo: subscribe to '{topic}' succeeded. {Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}echo: subscribe to '{topic}' failed.{Style.RESET_ALL}")
 
         print(f"{Fore.YELLOW}echo: connect succeeded, subscribing to topic '{SUBSCRIBE_TOPIC}'...{Style.RESET_ALL}")
         result, _ = client.subscribe(SUBSCRIBE_TOPIC)
         display(result, SUBSCRIBE_TOPIC)
+
+        print(f"{Fore.YELLOW}echo: subscribing to extra topic '{EXTRA_TOPIC}'...{Style.RESET_ALL}")
+        result, _ = client.subscribe(EXTRA_TOPIC)
+        display(result, EXTRA_TOPIC)
 
         print(f"{Fore.YELLOW}echo: subscribing to will topic '{WILL_TOPIC}'...{Style.RESET_ALL}")
         result, _ = client.subscribe(WILL_TOPIC)
@@ -51,8 +58,10 @@ def on_message(client, userdata, msg):
             print(f"{Fore.YELLOW}echo: echo succeeded {Style.RESET_ALL}")
         else:
             print(f"{Fore.YELLOW}echo: echo failed, result code: ${res[0]}{Style.RESET_ALL}")
-    else:
+    elif msg.topic == WILL_TOPIC:
         print(f"{Fore.YELLOW}echo: recieved will message with topic '{msg.topic}': {msg.payload} {Style.RESET_ALL}")
+    else:
+        print(f"{Fore.YELLOW}echo: recieved message with topic '{msg.topic}': {msg.payload} {Style.RESET_ALL}")
 
 def main():
     client = mqtt.Client(CLIENT_ID)
