@@ -22,12 +22,12 @@ Connect the prepared **Demo Router** to your router/switch.
 graph TD
  user[(<center>User Router<br>192.168.1.1</center>)]---|Ethernet|demo[(<center>192.168.1.x<br><br>Demo Router<br><br>192.168.111.1</center>)]
  demo-.-|Wi-Fi|duet(<center>192.168.111.x<br>Duet Board</center>)
- user---|Ethernet or|pc(<center>192.168.1.y<br>Host PC</center>)
+ user---|Ethernet|pc(<center>192.168.1.y<br>Host PC</center>)
  user-.-|Wi-Fi|pc
  pc---|USB-Serial|duet
 ```
 
-The diagram above assumes the user network is `192.168.1.0/24`, with the **User Router** at `192.168.1.1`. Both **Host PC** and **Demo Router** is connected to user network, getting IP addresses `192.168.1.x` and `192.168.1.y`, respectively via DHCP.
+The diagram above assumes the user network is `192.168.1.0/24`, with the **User Router** at `192.168.1.1`. Both **Host PC** and **Demo Router** is connected to user network, getting IP addresses `192.168.1.x` and `192.168.1.y`, respectively via DHCP. **Host PC** can be connected to user network either via Ethernet or Wi-Fi.
 
 **Demo Router** in turn, creates a network `192.168.111.0/24` with its IP at `192.168.111.1`. It also creates access points the **Duet Board** can connect to, see [wifi/README.md](wifi/README.md) for more details. If **Duet Board** connects to **Demo Router**, it gets its address `192.168.111.x` via DHCP.
 
