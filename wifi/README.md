@@ -12,7 +12,7 @@ The demo router does the following:
 
 ## Preparation
 
-Copy the `client.pem`, `client.cert`, `client.key`, `ca.cert` to the `sys` folder on your board's SD card.
+Copy the `client.cert`, `client.key`, `ca.pem` to the `sys` folder on your board's SD card.
 
 ## Demo
 
@@ -27,7 +27,7 @@ M587 S"demo-wifi" P"demo-pswd"
 
 EAP-TLS
 ```
-M587 X1 S"demo-wifi2" U"client.crt" P"client.key" A"anon"
+M587 X1 S"demo-wifi2" U"client.crt" P"client.key" A"demo-anon"
 ```
 
 EAP-PEAP-MSCHAPv2
