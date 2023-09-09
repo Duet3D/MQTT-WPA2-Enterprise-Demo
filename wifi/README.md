@@ -27,7 +27,7 @@ M587 S"demo-wifi" P"demo-pswd"
 
 EAP-TLS
 ```
-M587 X1 S"demo-wifi2" U"client.crt" P"client.key" Q"cert-pswd"
+M587 X1 S"demo-wifi2" U"client.crt" P"client.key" Q"cert-pswd" A"anon"
 ```
 
 EAP-PEAP-MSCHAPv2
