@@ -1,4 +1,8 @@
-### Hardware
+### Demo Router
+
+#### Hardware
+
+The **Demo Router** is constructed from the following components:
 
 - Raspberry Pi 4B
 - MicroSD card, at least 256MB
@@ -10,9 +14,9 @@ Simply copy the contents of [backup.img.gz](./backup.image.gz) onto the SD card.
 
 Connect the PAU0A Wi-Fi USB Adapter to one of the Raspberry Pi's USB ports. This adapter can be ommitted if the WPA2-Enterprise access point is not needed.
 
-### Setup
+#### Setup
 
-Connect the Raspberry Pi to your router/switch.
+Connect the prepared **Demo Router** to your router/switch.
 
 ```mermaid
 graph TD
