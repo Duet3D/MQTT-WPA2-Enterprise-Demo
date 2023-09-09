@@ -2,11 +2,13 @@
 
 - Raspberry Pi 4B
 - MicroSD card, at least 256MB
-- PAU0A Wi-Fi USB Adapter
+- PAU0A Wi-Fi USB Adapter (optional)
 
 #### Preparation
 
 Simply copy the contents of [backup.img.gz](./backup.image.gz) onto the SD card. Depending on the tool, you might need to decompress the file first.
+
+Connect the PAU0A Wi-Fi USB Adapter to one of the Raspberry Pi's USB ports. This adapter can be ommitted if the WPA2-Enterprise access point is not needed.
 
 ### Setup
 
