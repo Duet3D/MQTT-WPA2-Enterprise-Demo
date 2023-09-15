@@ -6,21 +6,18 @@
 
 # Overview
 
-## Setup
 
 The demo has three components: the MQTT broker, the `echo` MQTT client and the RRF MQTT client.
+The MQTT broker runs on the **Demo Router**, the `echo` MQTT client on the **Host PC**, and the RRF MQTT client on the **Duet Board**.
 
-The RRF MQTT client publishes message sent via `M118` under a topic `topic-duet`.
-The `echo` MQTT client is subscribed to this topic, which retransmits the message under the topic `topic-echo`. Since the RRF MQTT client in turn is subscribed to this topic, it receives and displays the retransmitted message.
+The RRF MQTT client publishes message using `M118` under the topic `topic-duet`.
+The `echo` MQTT client is subscribed to this topic, which retransmits the message under the topic `topic-echo`. The RRF MQTT client is, in turn, subscribed to `topic-echo`. The RRF MQTT client receives and displays the message under `topic-echo`.
 
-### Broker
-
-Broker configuration can be found in [mosquitto.conf](mosquitto.conf). This configuration:
+MQTT broker configuration can be found in [mosquitto.conf](mosquitto.conf). This configuration:
 - disallows anonymous clients, allowing only clients with authentication credentials to connect
 - specifies the password file, [passwords.txt](passwords.txt), whose contents are the allowed client usernames and the corresponding password hashes
 - specifies the MQTT broker port, 1883
 
-#### Password File
 
 The clear text contents of the password file [passwords.txt](./passwords.txt) are as follows:
 
@@ -31,12 +28,16 @@ mqtt-duet:mqtt-duet-pswd
 
 Running the command `mosquitto_passwd -U passwords.txt` on the clear text contents will replace the password part (the text after the colon on each row) with its hash.
 
-The first row are the credentials for the `echo` client; the second are the credentials for the RRF MQTT client.
+The first row are the credentials for the `echo` MQTT client; the second are the credentials for the RRF MQTT client.
 
 
 # Running the Demo
 
-## Host
+## Demo Router
+
+The MQTT broker is a service on the **Demo Router**; if the **Demo Router** is up, the MQTT broker is also be up.
+
+## Host PC
 
 Open a command line/terminal and `cd` into this directory, then run the command below.
 
@@ -44,7 +45,7 @@ Open a command line/terminal and `cd` into this directory, then run the command 
 python echo.py
 ```
 
-The following should be seen.
+The following log should be seen:
 
 ```
 echo: connecting to 'demo-router' on port '1883' as 'echo'...
@@ -56,8 +57,9 @@ echo: subscribing to will topic 'topic-will'...
 echo: subscribe to 'topic-will' succeeded.
 ```
 
-## Board
+## Duet Board
 
+Connect your **Duet Board** to your **Host PC** via USB. Open the serial port to the **Duet Board**  and send the Gcode below.
 
 ### Enable debugging messages (optional)
 
@@ -91,8 +93,8 @@ M586.4 W"message-will" T"topic-will"
 
 Notes:
 
-- Max QOS=0 for 'topic-echo' subscription since it's not specified. It can be specified using parameter `M`.
-- QOS=0, Retain=False for last will and testament, since they're not specified. These can be specified using parameters `Q` and `R`, respectively.
+- Max QOS=0 for 'topic-echo' subscription since it's not specified. It can be specified using parameter `O`.
+- QOS=0, retain=False for last will and testament, since they're not specified. These can be specified using parameters `Q` and `R`, respectively.
 
 ### Enable the MQTT protocol
 
@@ -142,7 +144,7 @@ echo: recieved message with topic 'topic-extra': b'message-extra'
 Notes:
 
 
-- Both messages above are published with QOS=0, Retain=False and Duplicate=False since they're not specified. These can be specified with parameters `Q`, `R`, and `D`, respectively.
+- Both messages above are published with QOS=0, retain=False and duplicate=False since they're not specified. These can be specified with parameters `Q`, `R`, and `D`, respectively.
 
 ### Disable the MQTT Protocol
 

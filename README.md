@@ -24,7 +24,7 @@ graph TD
  demo-.-|Wi-Fi|duet(<center>192.168.111.x<br>Duet Board</center>)
  user---|Ethernet|pc(<center>192.168.1.y<br>Host PC</center>)
  user-.-|Wi-Fi|pc
- pc---|USB-Serial|duet
+ pc---|USB|duet
 ```
 
 The diagram above assumes the user network is `192.168.1.0/24`, with the **User Router** at `192.168.1.1`. Both **Host PC** and **Demo Router** is connected to user network, getting IP addresses `192.168.1.x` and `192.168.1.y`, respectively via DHCP. **Host PC** can be connected to user network either via Ethernet or Wi-Fi.
