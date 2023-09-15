@@ -1,9 +1,7 @@
 
 ## Overview
 
-## Setup
-
-The demo router does the following:
+The **Demo Router** does the following:
 
 - Runs a `FreeRADIUS` server for enterprise network authentication
 - Creates the following access points:
@@ -12,18 +10,20 @@ The demo router does the following:
 
 ## Preparation
 
-Copy the `client.cert`, `client.key`, `ca.pem` to the `sys` folder on your board's SD card.
+Copy the `client.cert`, `client.key`, `ca.pem` to the `sys` folder on the **Duet Board**'s SD card.
 
 ## Demo
 
+Connect your **Duet Board** to your **Host PC** via USB. Open the serial port to the **Duet Board**  and send the Gcode below.
+
 ### Configuring
 
-#### Personal
+#### WPA2-Personal
 ```
 M587 S"demo-wifi" P"demo-pswd"
 ```
 
-#### Enterprise
+#### WPA2-Enterprise
 
 EAP-TLS
 ```
