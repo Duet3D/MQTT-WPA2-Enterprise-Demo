@@ -162,3 +162,42 @@ The following message will be printed by the `echo` client.
 ```
 echo: recieved will message with topic 'topic-will': b'message-will'
 ```
+
+# MQTT Configuration in `config.g`
+
+The MQTT client configuration commands (`M586.4`) and MQTT protocol enabling command (`M586 P4`)
+can be executed from `config.g`. It is recommended to execute the `M586.4` commands first before
+`M586 P4`.
+
+Using the credentials in this demonstrations for example, the following snippet can be
+added to the `config.g`.
+
+```
+; Configure MQTT client
+M586.4 C"duet" ; client name
+M586.4 U"mqtt-duet" K"mqtt-duet-pswd" ; username and password
+M586.4 S"topic-echo" ; subscription topic
+M586.4 W"message-will" T"topic-will" R0 ; will topic and message
+; Enable MQTT protocol
+M586 P4 H192.168.111.1 S1
+```
+
+## On Versions Prior to RepRapFirmware 3.5.2
+
+On RepRapFirmware versions prior to 3.5.2, configuring MQTT in `config.g` does not work.
+The workaround is to instead do the configuration on `daemon.g`, with a little bit of additional
+logic to only run it once:
+
+```
+if !exists(global.mqttInited)
+    ; Configure MQTT client
+    M586.4 C"duet" ; client name
+    M586.4 U"mqtt-duet" K"mqtt-duet-pswd" ; username and password
+    M586.4 S"topic-echo" ; subscription topic
+    M586.4 W"message-will" T"topic-will" R0 ; will topic and message
+    ; Enable MQTT protocol
+    M586 P4 H192.168.111.1 S1
+    ; Since daemon.g runs repeatedly, use a variable to only run
+    ; MQTT client configuration once; see first line.
+    global mqttInited = true
+```
