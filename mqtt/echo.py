@@ -1,6 +1,7 @@
 # Runs the MQTT broker and echo client. See README.md for more information
 # about the demonstration this Python script is a part of.
 
+import paho.mqtt
 import paho.mqtt.client as mqtt
 import subprocess
 
@@ -64,7 +65,11 @@ def on_message(client, userdata, msg):
         print(f"{Fore.YELLOW}echo: recieved message with topic '{msg.topic}': {msg.payload} {Style.RESET_ALL}")
 
 def main():
-    client = mqtt.Client(CLIENT_ID)
+    if paho.mqtt.__version__[0] > '1':
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, CLIENT_ID)
+    else:
+        client = mqtt.Client(CLIENT_ID)
+
     client.username_pw_set(USERNAME, PASSWORD)
 
     client.on_connect = on_connect
