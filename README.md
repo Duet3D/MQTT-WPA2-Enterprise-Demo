@@ -7,12 +7,15 @@ The **Demo Router** is constructed from the following components:
 - Raspberry Pi 4B
 - MicroSD card, at least 256MB
 - PAU0A Wi-Fi USB Adapter (optional)
+- UGREEN USB-A 3.0 To Gigabit Ethernet Adapter (CR111/20256) or other AX88179-based adapters (optional)
 
 #### Preparation
 
-Simply image the microSD card with [backup.img.gz](./backup.image.gz). Depending on the tool, you might need to decompress the file first.
+Simply image the microSD card with the OpenWRT-based [backup.img.gz](./backup.image.gz). Depending on the tool, you might need to decompress the file first.
 
-Connect the PAU0A Wi-Fi USB Adapter to one of the Raspberry Pi's USB ports. This adapter can be ommitted if the WPA2-Enterprise access point is not needed.
+Connect the PAU0A Wi-Fi USB Adapter and UGREEN USB-A 3.0 To Gigabit Ethernet Adapter (CR111/20256), if any, to one of the Raspberry Pi's USB ports.
+
+The optional *PAU0A Wi-Fi USB Adapter* is needed for testing enterprise Wi-Fi, and the optional *UGREEN USB-A 3.0 To Gigabit Ethernet Adapter (CR111/20256)* is needed when using an Ethernet Duet Board. Using other USB to Wi-Fi/Ethernet adapter is ok, though you might need to install the appropriate OpenWRT drivers.
 
 #### Setup
 
@@ -21,7 +24,8 @@ Connect the prepared **Demo Router** to your router/switch.
 ```mermaid
 graph TD
  user[(<center>User Router<br>192.168.1.1</center>)]---|Ethernet|demo[(<center>192.168.1.x<br><br>Demo Router<br><br>192.168.111.1</center>)]
- demo-.-|Wi-Fi|duet(<center>192.168.111.x<br>Duet Board</center>)
+ demo---|Ethernet|duet(<center>192.168.111.x<br>Duet Board</center>)
+ demo-.-|Wi-Fi|duet
  user---|Ethernet|pc(<center>192.168.1.y<br>Host PC</center>)
  user-.-|Wi-Fi|pc
  pc---|USB|duet
