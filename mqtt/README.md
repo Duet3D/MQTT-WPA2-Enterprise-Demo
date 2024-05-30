@@ -163,7 +163,9 @@ The following message will be printed by the `echo` client.
 echo: recieved will message with topic 'topic-will': b'message-will'
 ```
 
-# MQTT Configuration in `config.g`
+# Miscellaneous Notes
+
+## MQTT Configuration in `config.g`
 
 The MQTT client configuration commands (`M586.4`) and MQTT protocol enabling command (`M586 P4`)
 can be executed from `config.g`. It is recommended to execute the `M586.4` commands first before
@@ -182,7 +184,7 @@ M586.4 W"message-will" T"topic-will" R0 ; will topic and message
 M586 P4 H192.168.111.1 S1
 ```
 
-## On Versions Prior to RepRapFirmware 3.5.2
+#### On Versions Prior to RepRapFirmware 3.5.2
 
 On RepRapFirmware versions prior to 3.5.2, configuring MQTT in `config.g` does not work.
 The workaround is to instead do the configuration on `daemon.g`, with a little bit of additional
@@ -200,4 +202,37 @@ if !exists(global.mqttInited)
     ; Since daemon.g runs repeatedly, use a variable to only run
     ; MQTT client configuration once; see first line.
     global mqttInited = true
+```
+
+## On Boards with Multiple Network Interfaces
+
+On boards with multiple network interfaces (i.e. Wi-Fi + Ethernet), the `I` parameter can be added to the `M586` command to specify on which interface MQTT will be enabled/disabled on. For example:
+
+```
+M586 P4 H192.168.111.1 S1 I0 ; enable on interface 0
+...
+M586 P4 S0 I0 ; disable on interface 0
+```
+
+or
+
+```
+M586 P4 H192.168.111.1 S1 I1 ; enable on interface 1
+...
+M586 P4 S0 I1 ; disable on interface 1
+```
+
+One thing to note is that the MQTT client supports being active on only one interface at a time. In order to enable MQTT on another interface, it has to be disabled on the current interface it is enabled on, if any. Assuming both interfaces are already enabled, for example:
+
+```
+M586.4 C"duet0" ; example config for interface 0
+M586 P4 H192.168.111.1 S1 I0 ; enable on interface 0
+...
+M118 P6 S"message-echo-0" T"topic-duet" ; publish on interface 0
+...
+M586 P4 S0 I0 ; need to switch to interface 1, disable on interface 0 first
+M586.4 C"duet1" ; example reconfig for interface 1 (if necessary)
+M586 P4 H192.168.111.1 S1 I1 ; enable on interface 1
+...
+M118 P6 S"message-echo-1" T"topic-duet" ; publish on interface 1
 ```
